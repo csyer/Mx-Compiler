@@ -87,8 +87,6 @@ CommentPara: '/*' .*? '*/' -> skip;
 Identifier: [a-zA-Z][a-zA-Z0-9_]*;
 
 // Constant
-Const: 'const';
-
 IntConst: [1-9][0-9]* | '0';
 
 Quote: '"';
