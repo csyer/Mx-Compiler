@@ -11,7 +11,12 @@ public class FunctionExprNode extends ExprNode {
     public FunctionExprNode(ExprNode func, Position pos) {
         super(pos);
         this.func = func;
-        this.args = null;
+        this.args = new ExprListNode(pos);
+    }
+
+    @Override
+    public boolean isAssignable() {
+        return false;
     }
 
     @Override

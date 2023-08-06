@@ -6,8 +6,8 @@ import ast.*;
 import ast.expr.*;
 
 public class WhileStmtNode extends StmtNode {
-    ExprNode condition;
-    StmtNode statement;
+    public ExprNode condition;
+    public StmtNode statement;
 
     public WhileStmtNode(ExprNode condition, StmtNode statement, Position pos) {
         super(pos);

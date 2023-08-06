@@ -5,11 +5,16 @@ import utils.*;
 import ast.*;
 
 public class LiteralExprNode extends ExprNode {
-    String type;
+    public String typename;
 
-    public LiteralExprNode(String type, Position pos) {
+    public LiteralExprNode(String typename, Position pos) {
         super(pos);
-        this.type = type;
+        this.typename = typename;
+    }
+
+    @Override
+    public boolean isAssignable() {
+        return false;
     }
 
     @Override
@@ -19,6 +24,6 @@ public class LiteralExprNode extends ExprNode {
 
     @Override
     public void debug() {
-        System.out.printf("%s", this.type);
+        System.out.printf("%s", this.typename);
     }
 }

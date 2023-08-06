@@ -6,10 +6,10 @@ import ast.*;
 import ast.expr.*;
 
 public class ForStmtNode extends StmtNode {
-    public ExprNode initial, condition, step;
-    public StmtNode statement;
+    public ExprNode condition, step;
+    public StmtNode initial, statement;
 
-    public ForStmtNode(ExprNode initial, ExprNode condition, ExprNode step, StmtNode statement, Position pos) {
+    public ForStmtNode(StmtNode initial, ExprNode condition, ExprNode step, StmtNode statement, Position pos) {
         super(pos);
         this.initial = initial;
         this.condition = condition;

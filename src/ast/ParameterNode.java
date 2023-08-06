@@ -11,6 +11,13 @@ public class ParameterNode extends ASTNode {
         super(pos);
     }
 
+    public boolean empty() {
+        return list.isEmpty();
+    }
+    public int size() {
+        return list.size();
+    }
+
     @Override
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);

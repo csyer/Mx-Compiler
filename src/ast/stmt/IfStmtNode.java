@@ -6,8 +6,8 @@ import ast.expr.*;
 import ast.*;
 
 public class IfStmtNode extends StmtNode {
-    ExprNode condition;
-    StmtNode trueStmt, falseStmt;
+    public ExprNode condition;
+    public StmtNode trueStmt, falseStmt;
 
     public IfStmtNode(ExprNode condition, StmtNode trueStmt, StmtNode falseStmt, Position pos) {
         super(pos);

@@ -18,7 +18,7 @@ public class ExprStmtNode extends StmtNode {
 
     @Override
     public void debug() {
-        this.expr.debug();
-        System.out.println("");
+        if (this.expr != null) 
+            this.expr.debug();
     }
 }

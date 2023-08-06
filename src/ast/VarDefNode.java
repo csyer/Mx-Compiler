@@ -3,13 +3,15 @@ package ast;
 import java.util.ArrayList;
 
 import ast.stmt.StmtNode;
-import utils.Position;
+import utils.*;
 
 public class VarDefNode extends StmtNode {
+    public Type type;
     public ArrayList<VarDefUnitNode> defs = new ArrayList<VarDefUnitNode>();
 
-    public VarDefNode(Position pos) {
+    public VarDefNode(Type type, Position pos) {
         super(pos);
+        this.type = type;
     }
 
     @Override

@@ -16,6 +16,11 @@ public class BinaryExprNode extends ExprNode {
     }
 
     @Override
+    public boolean isAssignable() {
+        return false;
+    }
+
+    @Override
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);
     }
@@ -24,7 +29,7 @@ public class BinaryExprNode extends ExprNode {
     public void debug() {
         System.out.print("(");
         this.lhs.debug();
-        System.out.printf(" " + op + " ");
+        System.out.printf(" " + this.op + " ");
         this.rhs.debug();
         System.out.print(")");
     }

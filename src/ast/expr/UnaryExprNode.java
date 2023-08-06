@@ -15,6 +15,13 @@ public class UnaryExprNode extends ExprNode {
     }
 
     @Override
+    public boolean isAssignable() {
+        if (this.op.equals("++") || this.op.equals("--")) 
+            return true;
+        return false;
+    }
+
+    @Override
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);
     }

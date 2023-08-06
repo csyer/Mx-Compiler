@@ -17,12 +17,6 @@ public interface MxParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitProgram(MxParser.ProgramContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MxParser#basicType}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitBasicType(MxParser.BasicTypeContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link MxParser#typename}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

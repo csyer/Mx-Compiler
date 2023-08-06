@@ -6,10 +6,15 @@ import ast.*;
 import java.util.ArrayList;
 
 public class ExprListNode extends ASTNode {
+    public Type type;
     public ArrayList<ExprNode> exprs = new ArrayList<ExprNode>();
 
     public ExprListNode(Position pos) {
         super(pos);
+    }
+    
+    public int size() {
+        return exprs.size();
     }
 
     @Override

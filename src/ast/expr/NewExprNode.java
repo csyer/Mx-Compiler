@@ -15,6 +15,11 @@ public class NewExprNode extends ExprNode {
     }
 
     @Override
+    public boolean isAssignable() {
+        return false;
+    }
+
+    @Override
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);
     }
