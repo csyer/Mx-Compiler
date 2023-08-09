@@ -413,7 +413,11 @@ public class SemanticChecker implements ASTVisitor, BuiltinElements {
         if (!node.trueExpr.type.equals(node.falseExpr.type)) {
             throw new Error("Return types should be the same.", node.pos);
         }
-        node.type = node.trueExpr.type;
+        if (node.trueExpr.type.equals(nullType)) {
+            node.type = node.falseExpr.type;
+        } else {
+            node.type = node.trueExpr.type;
+        }
     }
 
     @Override
