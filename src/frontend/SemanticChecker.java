@@ -70,6 +70,14 @@ public class SemanticChecker implements ASTVisitor, BuiltinElements {
         if (!typename.equals("void") && gScope.getClass(typename) == null) {
             throw new Error("Undefined type " + typename, node.pos);
         }
+        if (currentScope.varDefs.get(node.funcName) != null) {
+            throw new Error("Function name is defined", node.pos);
+        }
+        if (node.className != null) {
+            if (node.funcName.equals(node.className)) {
+                throw new Error("Function name cannot be the same as constructor", node.pos);
+            }
+        }
 
         currentScope = new Scope(currentScope);
         currentScope.returnType = node.returnType;

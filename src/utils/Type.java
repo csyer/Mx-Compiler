@@ -1,11 +1,14 @@
 package utils;
 
+import IR.type.IRType;
 import parser.MxParser.TypeContext;
 
 public class Type {
     public String typeName;
     public boolean isClass = true, isAssignable = true, isPrimitive = false;
     public int dim = 0;
+
+    public IRType irType;
 
     public Type(String typeName) {
         this.typeName = typeName;

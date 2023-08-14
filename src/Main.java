@@ -9,12 +9,12 @@ import ast.*;
 import frontend.*;
 import parser.*;
 import utils.*;
-// import utils.Error;
+import utils.Error;
 import semantic.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        // try {
+        try {
             MxLexer lexer = new MxLexer(CharStreams.fromStream(System.in));
             lexer.removeErrorListeners();
             lexer.addErrorListener(new MxErrorListener());
@@ -35,11 +35,11 @@ public class Main {
             // FileOutputStream irOut = new FileOutputStream("test.ll");
             // irOut.write(irProgram.toString().getBytes());
             // irOut.close();
-        // } catch ( Error err ) {
-        //     System.err.println("Fail");
-        //     System.out.println(err.toString());
-        //     return ;
-        // } 
-        // System.err.println("Success");
+        } catch ( Error err ) {
+            System.err.println("Fail");
+            System.out.println(err.toString());
+            return ;
+        } 
+        System.err.println("Success");
     }
 }

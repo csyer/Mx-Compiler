@@ -22,10 +22,16 @@ public class SymbolCollector implements ASTVisitor {
 
     @Override
     public void visit(VarDefUnitNode node) {
+        FuncDefNode funcDef = gScope.getFunc(node.varName);
+        if (funcDef != null)
+            throw new Error(node.varName + " is defined", funcDef.pos);
     }
 
     @Override
     public void visit(VarDefNode node) {
+        for (var unit : node.defs) {
+            unit.accept(this);
+        }
     }
 
     @Override
@@ -69,6 +75,9 @@ public class SymbolCollector implements ASTVisitor {
             for (var unit : def.defs) {
                 if (node.memberVars.get(unit.varName) != null) {
                     throw new Error(unit.varName + " is defined", unit.pos);
+                }
+                if (node.className.equals(unit.varName)) {
+                    throw new Error(unit.varName + " is the constructor", unit.pos);
                 }
                 node.memberVars.put(unit.varName, unit);
             }
