@@ -704,6 +704,13 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
         node.condition.accept(this);
         IREntity cond = loadVal(node.condition);
 
+        IRVar ptr = null;
+        if (!node.type.equals(voidType)) {
+            IRType type = toIRType(node.type);
+            ptr = new IRLocalVar(new IRPtrType(type), "cond");
+            currentBlock.addInst(new IRAllocaInst(currentBlock, ptr, type));
+        }
+
         IRBasicBlock trueBlock = new IRBasicBlock(currentFunc, "cond.true");
         IRBasicBlock falseBlock = new IRBasicBlock(currentFunc, "cond.false");
         IRBasicBlock endBlock = new IRBasicBlock(currentFunc, "cond.end");
@@ -715,31 +722,24 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
         currentFunc.blocks.add(trueBlock);
         currentBlock = trueBlock;
         node.trueExpr.accept(this);
-        IREntity trueVar = null;
-        if (!node.trueExpr.type.equals(voidType))
-            trueVar = loadVal(node.trueExpr);
+        if (!node.trueExpr.type.equals(voidType)) {
+            currentBlock.addInst(new IRStoreInst(currentBlock, loadVal(node.trueExpr), ptr));
+        }
         currentBlock.isFinished = true;
-        String trueBlockName = currentBlock.name;
 
         falseBlock.terminal = new IRJumpInst(falseBlock, endBlock);
         currentFunc.blocks.add(falseBlock);
         currentBlock = falseBlock;
         node.falseExpr.accept(this);
-        IREntity falseVar = null;
-        if (!node.trueExpr.type.equals(voidType))
-            falseVar = loadVal(node.falseExpr);
+        if (!node.trueExpr.type.equals(voidType)) {
+            currentBlock.addInst(new IRStoreInst(currentBlock, loadVal(node.falseExpr), ptr));
+        }
         currentBlock.isFinished = true;
-        String falseBlockName = currentBlock.name;
 
         currentBlock = endBlock;
         currentFunc.blocks.add(endBlock);
         if (!node.type.equals(voidType)) {
-            IRVar val = new IRLocalVar(toIRType(node.type), "cond");
-            IRPhiInst phiInst = new IRPhiInst(endBlock, val);
-            phiInst.addLabel(trueVar, trueBlockName);
-            phiInst.addLabel(falseVar, falseBlockName);
-            endBlock.addInst(phiInst);
-            node.value = val;
+            node.ptr = ptr;
         }
     }
 
