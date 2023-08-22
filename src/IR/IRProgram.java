@@ -35,7 +35,7 @@ public class IRProgram implements BuiltinElements {
         for (var def : classDefs) 
             res += def.declare() + "\n";
         for (var str : strConsts.values()) 
-            res += str + " = private unnamed_addr constant [" + String.valueOf(str.value.length() + 1) + " x i8] c\"" + str.printStr() + "\" \n";
+            res += str + " = private unnamed_addr constant [" + String.valueOf(str.length + 1) + " x i8] c\"" + str.value + "\" \n";
         for (var var : gVars)
             res += var + " = global " + ((IRPtrType) var.type).type + " " + var.initial + "\n"; 
 

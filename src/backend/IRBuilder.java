@@ -41,17 +41,7 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
         return irType;
     }
     private String strTrans(String str) {
-        String res = "";
-        for (int i = 0; i < str.length(); ++i) {
-            char c = str.charAt(i);
-            if (c == '\\') {
-                c = str.charAt(++i);
-                if (c == 'n') res += '\n';
-                else if (c == '\"') res += '\"';
-                else res += '\\';
-            } else res += c;
-        }
-        return res;
+        return str.substring(0, str.length()).replace("\\n", "\n").replace("\\\"", "\"").replace("\\\\", "\\");
     }
     private IREntity loadVal(ExprNode node) {
         if (node.value != null) 
