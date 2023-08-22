@@ -6,12 +6,12 @@ public class IRBoolConst extends IRConst {
     public boolean value;
 
     public IRBoolConst(boolean value) {
-        super(new IRIntType(8));
+        super(new IRIntType(1));
         this.value = value;
     }
 
     @Override
     public String toString() {
-        return value ? "1" : "0";
+        return value ? "true" : "false";
     }
 }

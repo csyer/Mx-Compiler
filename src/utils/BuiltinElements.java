@@ -1,5 +1,13 @@
 package utils;
 
+import IR.entity.IRBoolConst;
+import IR.entity.IRIntConst;
+import IR.entity.IRNullConst;
+import IR.entity.IRVoidConst;
+import IR.type.IRIntType;
+import IR.type.IRPtrType;
+import IR.type.IRType;
+import IR.type.IRVoidType;
 import ast.FuncDefNode;
 
 public interface BuiltinElements {
@@ -24,4 +32,20 @@ public interface BuiltinElements {
     FuncDefNode stringOrdFunc = new FuncDefNode(intType, "ord", "string", null);
 
     FuncDefNode ArraySizeFunc = new FuncDefNode(intType, "size", null);
+
+    IRType irVoidType = new IRVoidType();
+    IRType irIntType = new IRIntType(32);
+    IRType irBoolType = new IRIntType(1);
+    IRType irCharType = new IRIntType(8);
+    IRType irStringtType = new IRPtrType(irCharType);
+    IRType irNullType = new IRPtrType(irVoidType);
+
+    IRVoidConst irVoidConst = new IRVoidConst();
+    IRNullConst irNullConst = new IRNullConst();
+    IRBoolConst irTrueConst = new IRBoolConst(true);
+    IRBoolConst irFalseConst = new IRBoolConst(false);
+    IRIntConst irIntConst0 = new IRIntConst(0);
+    IRIntConst irIntConst1 = new IRIntConst(1);
+    IRIntConst irIntConstn1 = new IRIntConst(-1);
+    IRIntConst irIntConst4 = new IRIntConst(4);
 }

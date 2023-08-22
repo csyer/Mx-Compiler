@@ -3,8 +3,8 @@ package frontend;
 import ast.*;
 import ast.expr.*;
 import ast.stmt.*;
-import semantic.*;
 import utils.Error;
+import utils.globalScope;
 
 public class SymbolCollector implements ASTVisitor {
     private globalScope gScope;

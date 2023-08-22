@@ -1,13 +1,15 @@
 package ast.stmt;
 
 import utils.*;
-
+import IR.IRBasicBlock;
 import ast.*;
 import ast.expr.*;
 
 public class WhileStmtNode extends StmtNode {
     public ExprNode condition;
     public StmtNode statement;
+
+    public IRBasicBlock loopBlock, nextBlock, condBlock;
 
     public WhileStmtNode(ExprNode condition, StmtNode statement, Position pos) {
         super(pos);

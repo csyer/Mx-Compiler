@@ -277,29 +277,27 @@ public class MxParser extends Parser {
 	public final TypeContext type() throws RecognitionException {
 		TypeContext _localctx = new TypeContext(_ctx, getState());
 		enterRule(_localctx, 4, RULE_type);
+		int _la;
 		try {
-			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(56);
 			typename();
 			setState(61);
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,2,_ctx);
-			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
-				if ( _alt==1 ) {
-					{
-					{
-					setState(57);
-					match(LBracket);
-					setState(58);
-					match(RBracket);
-					}
-					} 
+			_la = _input.LA(1);
+			while (_la==LBracket) {
+				{
+				{
+				setState(57);
+				match(LBracket);
+				setState(58);
+				match(RBracket);
+				}
 				}
 				setState(63);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,2,_ctx);
+				_la = _input.LA(1);
 			}
 			}
 		}
@@ -1554,8 +1552,8 @@ public class MxParser extends Parser {
 	@SuppressWarnings("CheckReturnValue")
 	public static class NewExprContext extends ExprContext {
 		public TerminalNode New() { return getToken(MxParser.New, 0); }
-		public TypeContext type() {
-			return getRuleContext(TypeContext.class,0);
+		public TypenameContext typename() {
+			return getRuleContext(TypenameContext.class,0);
 		}
 		public List<ArrayDefContext> arrayDef() {
 			return getRuleContexts(ArrayDefContext.class);
@@ -1742,7 +1740,7 @@ public class MxParser extends Parser {
 				setState(213);
 				match(New);
 				setState(214);
-				type();
+				typename();
 				setState(218);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,20,_ctx);
@@ -2351,7 +2349,7 @@ public class MxParser extends Parser {
 		"\u00cf)\u0001\u0000\u0000\u0000\u00d0\u00d1\u0006\u0015\uffff\uffff\u0000"+
 		"\u00d1\u00d2\u0005\u001b\u0000\u0000\u00d2\u00d3\u0003*\u0015\u0000\u00d3"+
 		"\u00d4\u0005\u001c\u0000\u0000\u00d4\u00e8\u0001\u0000\u0000\u0000\u00d5"+
-		"\u00d6\u0005\'\u0000\u0000\u00d6\u00da\u0003\u0004\u0002\u0000\u00d7\u00d9"+
+		"\u00d6\u0005\'\u0000\u0000\u00d6\u00da\u0003\u0002\u0001\u0000\u00d7\u00d9"+
 		"\u0003(\u0014\u0000\u00d8\u00d7\u0001\u0000\u0000\u0000\u00d9\u00dc\u0001"+
 		"\u0000\u0000\u0000\u00da\u00d8\u0001\u0000\u0000\u0000\u00da\u00db\u0001"+
 		"\u0000\u0000\u0000\u00db\u00df\u0001\u0000\u0000\u0000\u00dc\u00da\u0001"+

@@ -1,4 +1,4 @@
-package semantic;
+package utils;
 
 import java.util.HashMap;
 

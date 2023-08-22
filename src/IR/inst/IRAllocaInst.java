@@ -5,17 +5,17 @@ import IR.entity.IRVar;
 import IR.type.IRType;
 
 public class IRAllocaInst extends IRInst {
-    public IRVar var;
+    public IRVar dest;
     public IRType type;
 
-    public IRAllocaInst(IRBasicBlock parentBlock, IRVar var, IRType type) {
+    public IRAllocaInst(IRBasicBlock parentBlock, IRVar dest, IRType type) {
         super(parentBlock);
-        this.var = var;
+        this.dest = dest;
         this.type = type;
     }
 
     @Override
     public String toString() {
-        return var + " = alloca " + type;
+        return dest + " = alloca " + type;
     }
 }

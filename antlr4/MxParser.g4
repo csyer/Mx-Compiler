@@ -53,7 +53,7 @@ exprList: expr (Comma expr)*;
 arrayDef: LBracket expr? RBracket;
 expr:
 	LParen expr RParen																	# NestedExpr
-	| New type (arrayDef)* (LParen RParen)?												# NewExpr
+	| New typename (arrayDef)* (LParen RParen)?												# NewExpr
 	| expr Component Identifier															# ComponentExpr
 	| expr LParen exprList? RParen														# FunctionExpr
 	| array = expr LBracket index = expr RBracket										# AccessArrayExpr

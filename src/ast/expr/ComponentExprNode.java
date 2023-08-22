@@ -1,12 +1,14 @@
 package ast.expr;
 
 import utils.*;
-
+import IR.entity.IRVar;
 import ast.*;
 
 public class ComponentExprNode extends ExprNode {
     public ExprNode object;
     public String member;
+
+    public IRVar objAddr;
 
     public ComponentExprNode(ExprNode object, String member, Position pos) {
         super(pos);

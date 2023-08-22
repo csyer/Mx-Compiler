@@ -1,8 +1,9 @@
 package IR.entity;
 
 import IR.type.IRType;
+import utils.BuiltinElements;
 
-public abstract class IREntity {
+public abstract class IREntity implements BuiltinElements {
     public IRType type;
 
     IREntity(IRType type) {

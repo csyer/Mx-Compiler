@@ -1,19 +1,32 @@
 package IR;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import IR.entity.IRVar;
+import IR.inst.IRAllocaInst;
 import IR.type.IRType;
 
 public class IRFunction {
     public String name;
     public IRType returnType;
+    public IRVar returnAddr;
+    public IRBasicBlock returnBlock;
+
     public ArrayList<IRVar> params = new ArrayList<IRVar>();
-    public ArrayList<IRBasicBlock> blocks = new ArrayList<IRBasicBlock>();
+    public LinkedList<IRBasicBlock> blocks = new LinkedList<IRBasicBlock>();
+    public ArrayList<IRAllocaInst> allocaInsts = new ArrayList<IRAllocaInst>();
 
     public IRFunction(IRType returnType, String name) {
         this.returnType = returnType;
         this.name = name;
+    }
+
+    public void finish() {
+        IRBasicBlock entryBlock = blocks.getFirst();
+        for (IRAllocaInst inst : allocaInsts)
+            entryBlock.insts.addFirst(inst);
+        blocks.add(returnBlock);
     }
 
     public String toString() {

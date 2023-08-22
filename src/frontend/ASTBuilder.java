@@ -172,7 +172,10 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode> {
         if (ctx.initial != null) {
             initial = (StmtNode) visit(ctx.initial);
         }
-        ExprStmtNode condition = (ExprStmtNode) visit(ctx.condition);
+        ExprStmtNode condition = new ExprStmtNode(new Position(ctx));
+        condition.expr = new LiteralExprNode("true", new Position(ctx));
+        if (ctx.condition.expr() != null) 
+            condition = (ExprStmtNode) visit(ctx.condition);
         ExprNode step = null;
         if (ctx.step != null) {
             step = (ExprNode) visit(ctx.step);
@@ -243,11 +246,11 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode> {
                 expr.exprs.add((ExprNode) visit(def.expr()));
             }
         }
-        expr.type = new Type(ctx.type());
+        expr.type = new Type(ctx.typename().getText());
         expr.type.dim = expr.dim;
-        // if (expr.exprs.size() == 0) {
-        //     throw new Error("Cannot create a empty array.", new Position(ctx));
-        // }
+        if (expr.exprs.size() == 0 && expr.dim != 0) {
+            throw new Error("Cannot create a empty array.", new Position(ctx));
+        }
         return expr;
     }
 

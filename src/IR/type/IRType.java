@@ -1,5 +1,6 @@
 package IR.type;
 
+import IR.entity.IRConst;
 import utils.BuiltinElements;
 
 public abstract class IRType implements BuiltinElements {
@@ -10,4 +11,10 @@ public abstract class IRType implements BuiltinElements {
         this.name = name;
         this.size = size;
     }
+
+    public String toString() {
+        return name;
+    }
+
+    public abstract IRConst defaultValue();
 }

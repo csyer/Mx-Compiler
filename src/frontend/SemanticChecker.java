@@ -3,7 +3,6 @@ package frontend;
 import ast.*;
 import ast.expr.*;
 import ast.stmt.*;
-import semantic.*;
 import utils.*;
 import utils.Error;
 
@@ -169,11 +168,9 @@ public class SemanticChecker implements ASTVisitor, BuiltinElements {
             currentScope = currentScope.parentScope;
         }
 
-        if (node.condition != null) {
-            node.condition.accept(this);
-            if (!node.condition.type.equals(boolType)) {
-                throw new Error("The return type should be 'bool'.", node.condition.pos);
-            }
+        node.condition.accept(this);
+        if (!node.condition.type.equals(boolType)) {
+            throw new Error("The return type should be 'bool'.", node.condition.pos);
         }
 
         if (node.step != null) {
@@ -447,11 +444,11 @@ public class SemanticChecker implements ASTVisitor, BuiltinElements {
 
     @Override
     public void visit(LiteralExprNode node) {
-        if (node.typename.equals("null")) {
+        if (node.str.equals("null")) {
             node.type = nullType;
-        } else if (node.typename.equals("true") || node.typename.equals("false")) {
+        } else if (node.str.equals("true") || node.str.equals("false")) {
             node.type = boolType;
-        } else if (node.typename.matches("\".*\"")) {
+        } else if (node.str.matches("\".*\"")) {
             node.type = stringType;
         } else {
             node.type = intType;

@@ -1,16 +1,13 @@
-// import java.io.FileOutputStream;
-
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
-// import IR.IRProgram;
+import IR.IRProgram;
 import ast.*;
-// import backend.IRBuilder;
+import backend.IRBuilder;
 import frontend.*;
 import parser.*;
 import utils.*;
 import utils.Error;
-import semantic.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -30,14 +27,12 @@ public class Main {
             new SymbolCollector(globalScope).visit(ast);
             new SemanticChecker(globalScope).visit(ast);
 
-            // IRProgram irProgram = new IRProgram();
-            // new IRBuilder(irProgram, globalScope).visit(ast);
-            // FileOutputStream irOut = new FileOutputStream("test.ll");
-            // irOut.write(irProgram.toString().getBytes());
-            // irOut.close();
+            IRProgram irProgram = new IRProgram();
+            new IRBuilder(irProgram, globalScope).visit(ast);
+            System.out.println(irProgram);
         } catch ( Error err ) {
             System.err.println("Fail");
-            System.out.println(err.toString());
+            // System.err.println(err.toString());
             return ;
         } 
         System.err.println("Success");

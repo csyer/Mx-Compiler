@@ -1,7 +1,7 @@
 package ast;
 
 import utils.*;
-
+import IR.IRFunction;
 import ast.stmt.*;
 
 public class FuncDefNode extends ASTNode {
@@ -9,6 +9,8 @@ public class FuncDefNode extends ASTNode {
     public String funcName, className = null;
     public ParameterNode param = null;
     public SuiteNode suite = null;
+
+    public IRFunction irFunc = null;
 
     public FuncDefNode(Type returnType, String funcName, Position pos) {
         super(pos);

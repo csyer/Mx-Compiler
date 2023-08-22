@@ -273,29 +273,27 @@ public class MxParser extends Parser {
 	public final TypeContext type() throws RecognitionException {
 		TypeContext _localctx = new TypeContext(_ctx, getState());
 		enterRule(_localctx, 4, RULE_type);
+		int _la;
 		try {
-			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(56);
 			typename();
 			setState(61);
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,2,_ctx);
-			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
-				if ( _alt==1 ) {
-					{
-					{
-					setState(57);
-					match(LBracket);
-					setState(58);
-					match(RBracket);
-					}
-					} 
+			_la = _input.LA(1);
+			while (_la==LBracket) {
+				{
+				{
+				setState(57);
+				match(LBracket);
+				setState(58);
+				match(RBracket);
+				}
 				}
 				setState(63);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,2,_ctx);
+				_la = _input.LA(1);
 			}
 			}
 		}
@@ -1527,8 +1525,8 @@ public class MxParser extends Parser {
 	}
 	public static class NewExprContext extends ExprContext {
 		public TerminalNode New() { return getToken(MxParser.New, 0); }
-		public TypeContext type() {
-			return getRuleContext(TypeContext.class,0);
+		public TypenameContext typename() {
+			return getRuleContext(TypenameContext.class,0);
 		}
 		public List<ArrayDefContext> arrayDef() {
 			return getRuleContexts(ArrayDefContext.class);
@@ -1707,7 +1705,7 @@ public class MxParser extends Parser {
 				setState(213);
 				match(New);
 				setState(214);
-				type();
+				typename();
 				setState(218);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,20,_ctx);
@@ -2247,7 +2245,7 @@ public class MxParser extends Parser {
 		"\2\2\2\u00ce\u00cf\3\2\2\2\u00cf\u00d0\3\2\2\2\u00d0\u00d1\7\34\2\2\u00d1"+
 		"+\3\2\2\2\u00d2\u00d3\b\27\1\2\u00d3\u00d4\7\35\2\2\u00d4\u00d5\5,\27"+
 		"\2\u00d5\u00d6\7\36\2\2\u00d6\u00ea\3\2\2\2\u00d7\u00d8\7)\2\2\u00d8\u00dc"+
-		"\5\6\4\2\u00d9\u00db\5*\26\2\u00da\u00d9\3\2\2\2\u00db\u00de\3\2\2\2\u00dc"+
+		"\5\4\3\2\u00d9\u00db\5*\26\2\u00da\u00d9\3\2\2\2\u00db\u00de\3\2\2\2\u00dc"+
 		"\u00da\3\2\2\2\u00dc\u00dd\3\2\2\2\u00dd\u00e1\3\2\2\2\u00de\u00dc\3\2"+
 		"\2\2\u00df\u00e0\7\35\2\2\u00e0\u00e2\7\36\2\2\u00e1\u00df\3\2\2\2\u00e1"+
 		"\u00e2\3\2\2\2\u00e2\u00ea\3\2\2\2\u00e3\u00e4\t\3\2\2\u00e4\u00ea\5,"+
