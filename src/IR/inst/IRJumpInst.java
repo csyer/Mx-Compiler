@@ -1,6 +1,7 @@
 package IR.inst;
 
 import IR.IRBasicBlock;
+import IR.IRVisitor;
 
 public class IRJumpInst extends IRTerminalInst {
     public IRBasicBlock to;
@@ -13,5 +14,10 @@ public class IRJumpInst extends IRTerminalInst {
     @Override
     public String toString() {
         return "br label %" + to.name;
+    }
+
+    @Override 
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
     }
 }

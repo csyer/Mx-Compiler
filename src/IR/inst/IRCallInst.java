@@ -3,6 +3,7 @@ package IR.inst;
 import java.util.ArrayList;
 
 import IR.IRBasicBlock;
+import IR.IRVisitor;
 import IR.entity.IREntity;
 import IR.entity.IRVar;
 import IR.type.IRType;
@@ -27,11 +28,16 @@ public class IRCallInst extends IRInst {
     public String toString() {
         String res = (dest != null ? dest + " = call " : "call ") + returnType + " @" + funcName + "(";
         for (int i = 0; i < args.size(); i++) {
-          if (i != 0) res += ", ";
+            if (i != 0) res += ", ";
             IREntity arg = args.get(i);
             res += arg.type + " " + arg;
         }
         res += ")";
         return res;
-      }
+    }
+
+    @Override 
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
+    }
 }

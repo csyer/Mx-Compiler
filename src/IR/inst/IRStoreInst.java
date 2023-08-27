@@ -1,6 +1,7 @@
 package IR.inst;
 
 import IR.IRBasicBlock;
+import IR.IRVisitor;
 import IR.entity.IREntity;
 
 public class IRStoreInst extends IRInst {
@@ -15,5 +16,10 @@ public class IRStoreInst extends IRInst {
     @Override
     public String toString() {
         return "store " + value.type + " " + value + ", ptr " + ptr;
+    }
+
+    @Override 
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
     }
 }

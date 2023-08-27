@@ -1,6 +1,7 @@
 package IR.inst;
 
 import IR.IRBasicBlock;
+import IR.IRVisitor;
 import IR.entity.IRVar;
 import IR.type.IRType;
 
@@ -17,5 +18,10 @@ public class IRAllocaInst extends IRInst {
     @Override
     public String toString() {
         return dest + " = alloca " + type;
+    }
+
+    @Override 
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
     }
 }

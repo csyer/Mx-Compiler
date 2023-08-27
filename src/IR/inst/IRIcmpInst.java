@@ -1,6 +1,7 @@
 package IR.inst;
 
 import IR.IRBasicBlock;
+import IR.IRVisitor;
 import IR.entity.IREntity;
 import IR.entity.IRVar;
 
@@ -20,5 +21,10 @@ public class IRIcmpInst extends IRInst {
     @Override
     public String toString() {
         return dest + " = icmp " + cond + " " + lhs.type + " " + lhs + ", " + rhs;
+    }
+
+    @Override 
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
     }
 }

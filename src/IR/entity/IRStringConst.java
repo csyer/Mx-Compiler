@@ -8,8 +8,12 @@ public class IRStringConst extends IRConst {
     public IRStringConst(String value) {
         super(irStringtType);
         this.length = value.length();
-        this.value = value.replace("\\", "\\\\").replace("\n", "\\0A").replace("\"", "\\22") + "\\00";
+        this.value = value ;
         this.idx = cnt++;
+    }
+
+    public String trans() {
+        return value.replace("\\", "\\\\").replace("\n", "\\0A").replace("\"", "\\22") + "\\00";
     }
 
     @Override 

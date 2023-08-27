@@ -6,13 +6,13 @@ import IR.IRBasicBlock;
 import IR.entity.IREntity;
 import IR.entity.IRVar;
 
-public class IRPhiInst extends IRInst {
+public class IRPhiInst {
     public IRVar dest;
     public ArrayList<IREntity> values = new ArrayList<IREntity>();
     public ArrayList<String> labels = new ArrayList<String>();
 
     public IRPhiInst(IRBasicBlock block, IRVar dest) {
-        super(block);
+        // super(block);
         this.dest = dest;
     }
 

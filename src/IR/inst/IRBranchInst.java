@@ -1,6 +1,7 @@
 package IR.inst;
 
 import IR.IRBasicBlock;
+import IR.IRVisitor;
 import IR.entity.IREntity;
 
 public class IRBranchInst extends IRTerminalInst {
@@ -17,5 +18,10 @@ public class IRBranchInst extends IRTerminalInst {
     @Override
     public String toString() {
         return "br " + cond.type + " " + cond + ", label %" + iftrue.name + ", label %" + iffalse.name;
+    }
+    
+    @Override 
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
     }
 }

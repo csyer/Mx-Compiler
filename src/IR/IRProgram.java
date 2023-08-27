@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import IR.entity.*;
-import IR.inst.*;
 import IR.type.*;
 import utils.BuiltinElements;
 
@@ -15,16 +14,7 @@ public class IRProgram implements BuiltinElements {
 
     public HashMap<String, IRStringConst> strConsts = new HashMap<>();
 
-    public IRFunction initFunc = new IRFunction(irVoidType, "_init"), mainFunc;
-    public IRBasicBlock initBlock = new IRBasicBlock(initFunc, "entry");
-
-    public IRProgram() {
-        IRBasicBlock exitBlock = new IRBasicBlock(initFunc, "return");
-        initBlock.terminal = new IRJumpInst(initBlock, exitBlock);
-        exitBlock.terminal = new IRRetInst(exitBlock, new IRVoidConst());
-        initFunc.blocks.add(initBlock);
-        initFunc.returnBlock = exitBlock;
-    }
+    public IRProgram() {}
 
     public String toString() {
         String res = "";
@@ -35,7 +25,7 @@ public class IRProgram implements BuiltinElements {
         for (var def : classDefs) 
             res += def.declare() + "\n";
         for (var str : strConsts.values()) 
-            res += str + " = private unnamed_addr constant [" + String.valueOf(str.length + 1) + " x i8] c\"" + str.value + "\" \n";
+            res += str + " = private unnamed_addr constant [" + String.valueOf(str.length + 1) + " x i8] c\"" + str.trans() + "\" \n";
         for (var var : gVars)
             res += var + " = global " + ((IRPtrType) var.type).type + " " + var.initial + "\n"; 
 
@@ -61,11 +51,13 @@ public class IRProgram implements BuiltinElements {
         res += "declare dso_local ptr @__new_array(i32, i32)\n";
         res += "declare dso_local ptr @__new_var(i32)\n\n";
 
-        if (initFunc != null)
-            res += initFunc + "\n";
         for (IRFunction func : funcDefs)
             res += func + "\n";
 
         return res;
+    }
+    
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
     }
 }

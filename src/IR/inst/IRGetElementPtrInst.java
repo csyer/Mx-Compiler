@@ -3,6 +3,7 @@ package IR.inst;
 import java.util.ArrayList;
 
 import IR.IRBasicBlock;
+import IR.IRVisitor;
 import IR.entity.IREntity;
 import IR.entity.IRVar;
 import IR.type.IRPtrType;
@@ -28,5 +29,10 @@ public class IRGetElementPtrInst extends IRInst {
         for (var idx : list) 
             res += ", " + idx.type + " " + idx;
         return res;
+    }
+
+    @Override 
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
     }
 }

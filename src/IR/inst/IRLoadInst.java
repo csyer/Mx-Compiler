@@ -1,6 +1,7 @@
 package IR.inst;
 
 import IR.IRBasicBlock;
+import IR.IRVisitor;
 import IR.entity.IREntity;
 import IR.entity.IRVar;
 import IR.type.IRType;
@@ -20,5 +21,10 @@ public class IRLoadInst extends IRInst {
     @Override
     public String toString() {
         return var + " = load " + type + ", " + ptr.type + " " + ptr;
+    }
+
+    @Override 
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
     }
 }

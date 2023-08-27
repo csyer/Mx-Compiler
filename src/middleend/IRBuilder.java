@@ -1,4 +1,4 @@
-package backend;
+package middleend;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +16,9 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
     IRFunction currentFunc = null;
     IRClassType currentClass = null;
     IRBasicBlock currentBlock = null;
+
+    IRFunction initFunc = new IRFunction(irVoidType, "_init"), mainFunc;
+    IRBasicBlock initBlock = new IRBasicBlock(initFunc, "entry");
 
     globalScope gScope;
     Scope currentScope;
@@ -55,6 +58,12 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
 
     @Override
     public void visit(ProgramNode node) {
+        IRBasicBlock exitBlock = new IRBasicBlock(initFunc, "return");
+        initBlock.terminal = new IRJumpInst(initBlock, exitBlock);
+        exitBlock.terminal = new IRRetInst(exitBlock, new IRVoidConst());
+        initFunc.blocks.add(initBlock);
+        initFunc.returnBlock = exitBlock;
+
         for (var def : node.defs) 
             if (def instanceof ClassDefNode) {
                 ClassDefNode classDef = (ClassDefNode) def;
@@ -70,14 +79,15 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
             if (def instanceof FuncDefNode) 
                 def.accept(this);
 
-        if (root.initBlock.insts.size() == 0) {
-            root.initFunc = null;
+        if (initBlock.insts.size() == 0) {
+            initFunc = null;
         } else {
-            root.initFunc.finish();
-            IRBasicBlock mainEntry = root.mainFunc.blocks.get(0);
+            initFunc.finish();
+            root.funcDefs.add(initFunc);
+            IRBasicBlock mainEntry = mainFunc.blocks.get(0);
             mainEntry.insts.addFirst(new IRCallInst(mainEntry, null, irVoidType, "_init"));
         }
-        root.mainFunc.finish();
+        mainFunc.finish();
     }
 
     @Override
@@ -108,11 +118,11 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
                     } else {
                         IRFunction tempFunc = currentFunc;
                         IRBasicBlock tempBlock = currentBlock;
-                        currentFunc = root.initFunc;
-                        currentBlock = root.initBlock;
+                        currentFunc = initFunc;
+                        currentBlock = initBlock;
                         node.initial.accept(this);
                         currentBlock.addInst(new IRStoreInst(currentBlock, loadVal(node.initial), gVar));
-                        root.initBlock = currentBlock;
+                        initBlock = currentBlock;
                         currentFunc = tempFunc;
                         currentBlock = tempBlock;
                     }
@@ -175,7 +185,7 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
             returnBlock.addInst(new IRLoadInst(currentBlock, retVal, retAddr));
             returnBlock.terminal = new IRRetInst(returnBlock, retVal);
             if (funcName.equals("main")) {
-                root.mainFunc = currentFunc;
+                mainFunc = currentFunc;
                 currentBlock.addInst(new IRStoreInst(currentBlock, irIntConst0, retAddr));
             }
             currentFunc.returnAddr = retAddr;

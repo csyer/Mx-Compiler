@@ -40,4 +40,8 @@ public class IRBasicBlock {
             res += "  " + terminal + "\n";
         return res;
     }
+
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
+    }
 }

@@ -1,6 +1,7 @@
 package IR.inst;
 
 import IR.IRBasicBlock;
+import IR.IRVisitor;
 import IR.entity.IREntity;
 
 public class IRRetInst extends IRTerminalInst {
@@ -14,5 +15,10 @@ public class IRRetInst extends IRTerminalInst {
     @Override
     public String toString() {
         return "ret " + value.type + " " + value;
+    }
+
+    @Override 
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
     }
 }

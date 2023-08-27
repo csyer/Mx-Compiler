@@ -38,12 +38,13 @@ public class IRFunction {
             res += param.type + " " + param;
         }
         res += ") {\n";
-
         for (var block : blocks) 
             res += block;
-
         res += "}\n";
-
         return res;
+    }
+    
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
     }
 }
