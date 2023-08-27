@@ -22,13 +22,13 @@ public class Main {
             assembly = true;
         } else if (args[0].equals("-fsyntax-only")) {
             semantic = true;
-            System.out.println("Semantic check");
+            System.err.println("Semantic check");
         } else if (args[0].equals("-S")) {
             semantic = true;
             assembly = true;
-            System.out.println("Generate assembly code");
+            System.err.println("Generate assembly code");
         } else {
-            System.out.println("Unknown option");
+            System.err.println("Unknown option");
             return;
         }
 
