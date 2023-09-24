@@ -10,7 +10,7 @@ import IR.entity.IRVar;
 public class IRStoreInst extends IRInst {
     public IREntity value;
     public IRVar ptr;
-    int param_idx = -1;
+    public int param_idx = -1;
 
     public IRStoreInst(IRBasicBlock block, IREntity value, IRVar ptr) {
         super(block);

@@ -2,18 +2,23 @@ package ASM;
 
 import java.util.LinkedList;
 
-import ASM.inst.ASMInst;
+import ASM.inst.*;
 
 public class ASMBasicBlock {
     public String name;
     public LinkedList<ASMInst> insts = new LinkedList<ASMInst>();
+
+    public LinkedList<ASMInst> phiInsts = new LinkedList<ASMInst>();
+    public LinkedList<ASMInst> jumpInsts = new LinkedList<ASMInst>();
 
     public ASMBasicBlock(String name) {
         this.name = name;;
     }
 
     public void addInst(ASMInst inst) {
-        insts.add(inst);
+        if (inst instanceof ASMJumpInst || inst instanceof ASMRetInst) 
+            jumpInsts.add(inst);
+        else insts.add(inst);
     }
 
     public String toString() {
