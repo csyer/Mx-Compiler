@@ -1,7 +1,11 @@
 package IR.inst;
 
+import java.util.LinkedList;
+
 import IR.IRBasicBlock;
 import IR.IRVisitor;
+import IR.entity.IREntity;
+import IR.entity.IRVar;
 
 public class IRJumpInst extends IRTerminalInst {
     public IRBasicBlock to;
@@ -14,6 +18,18 @@ public class IRJumpInst extends IRTerminalInst {
     @Override
     public String toString() {
         return "br label %" + to.name;
+    }
+
+    @Override
+    public LinkedList<IREntity> getUse() {
+        return new LinkedList<>();
+    }
+    @Override
+    public IRVar getDef() {
+        return null;
+    }
+    @Override
+    public void renameUse(IREntity ori, IREntity lat) {
     }
 
     @Override 

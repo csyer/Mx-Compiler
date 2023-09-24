@@ -1,6 +1,7 @@
 package IR.inst;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import IR.IRBasicBlock;
 import IR.IRVisitor;
@@ -34,6 +35,26 @@ public class IRCallInst extends IRInst {
         }
         res += ")";
         return res;
+    }
+
+    @Override
+    public LinkedList<IREntity> getUse() {
+        return new LinkedList<>() {
+            {
+                for (var arg : args)
+                    add(arg);
+            }
+        };
+    }
+    @Override
+    public IRVar getDef() {
+        return dest;
+    }
+    @Override
+    public void renameUse(IREntity ori, IREntity lat) {
+        for (int i = 0; i < args.size(); i++)
+          if (args.get(i) == ori)
+            args.set(i, lat);
     }
 
     @Override 

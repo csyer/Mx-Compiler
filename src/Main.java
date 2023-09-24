@@ -16,15 +16,20 @@ import utils.Error;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        boolean semantic = false, assembly = false;
+        boolean semantic = false, llvm = false, assembly = false;
         if (args.length == 0) {
             semantic = true;
+            llvm = true;
             assembly = true;
         } else if (args[0].equals("-fsyntax-only")) {
             semantic = true;
             System.err.println("Semantic check");
+        } else if (args[0].equals("-emit-llvm")) {
+            semantic = true;
+            llvm = true;
         } else if (args[0].equals("-S")) {
             semantic = true;
+            llvm = true;
             assembly = true;
             System.err.println("Generate assembly code");
         } else {
@@ -49,20 +54,25 @@ public class Main {
                 new SymbolCollector(globalScope).visit(ast);
                 new SemanticChecker(globalScope).visit(ast);
 
-                if (assembly) {
+                if (llvm) {
                     IRProgram irProgram = new IRProgram();
                     new IRBuilder(irProgram, globalScope).visit(ast);
-                    FileOutputStream irOut = new FileOutputStream("test.ll");
-                    irOut.write(irProgram.toString().getBytes());
-                    irOut.close();
+                    new CFGBuilder(irProgram).work();
+                    new Mem2Reg(irProgram).work();
+                    
+                    if (assembly) {
+                        FileOutputStream irOut = new FileOutputStream("test.ll");
+                        irOut.write(irProgram.toString().getBytes());
+                        irOut.close();
 
-                    ASMProgram asmProgram = new ASMProgram();
-                    new InstSelector(asmProgram).visit(irProgram);
-                    new RegAllocator(asmProgram).work();
-                    // FileOutputStream asmOut = new FileOutputStream("test.s");
-                    // asmOut.write(asmProgram.toString().getBytes());
-                    // asmOut.close();
-                    System.out.println(asmProgram);
+                        ASMProgram asmProgram = new ASMProgram();
+                        new InstSelector(asmProgram).visit(irProgram);
+                        new RegAllocator(asmProgram).work();
+                        // FileOutputStream asmOut = new FileOutputStream("test.s");
+                        // asmOut.write(asmProgram.toString().getBytes());
+                        // asmOut.close();
+                        System.out.println(asmProgram);
+                    } else System.out.println(irProgram);
                 }
             }
 

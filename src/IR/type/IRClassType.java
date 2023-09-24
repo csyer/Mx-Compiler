@@ -29,7 +29,7 @@ public class IRClassType extends IRType {
         return res;
     }
     
-    public String natureName() { 
+    public String getName() { 
         return name.substring(7);
     }
 

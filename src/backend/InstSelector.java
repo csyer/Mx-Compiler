@@ -204,4 +204,7 @@ public class InstSelector implements IRVisitor, BuiltinElements {
         storeMem(getReg(node.value), getReg(node.ptr), 0);
     }
 
+    public void visit(IRPhiInst node) {
+    }
+
 }

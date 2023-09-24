@@ -1,23 +1,26 @@
 package IR.inst;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import IR.IRBasicBlock;
+import IR.IRVisitor;
 import IR.entity.IREntity;
 import IR.entity.IRVar;
 
-public class IRPhiInst {
+public class IRPhiInst extends IRInst {
     public IRVar dest;
     public ArrayList<IREntity> values = new ArrayList<IREntity>();
     public ArrayList<String> labels = new ArrayList<String>();
 
+    public IRVar src = null;
     public IRPhiInst(IRBasicBlock block, IRVar dest) {
-        // super(block);
+        super(block);
         this.dest = dest;
     }
 
     public void addLabel(IREntity value, String label) {
-        values.add(value);
+        values.add(value == null ? dest.type.defaultValue() : value);
         labels.add(label);
     }
 
@@ -29,5 +32,29 @@ public class IRPhiInst {
             res += "[ " + values.get(i) + ", %" + labels.get(i) + " ]";
         }
         return res;
+    }
+
+    @Override
+    public LinkedList<IREntity> getUse() {
+        return new LinkedList<>() {
+            {
+                for (var value : values)
+                    add(value);
+            }
+        };
+    }
+    @Override
+    public IRVar getDef() {
+        return dest;
+    }
+    @Override
+    public void renameUse(IREntity ori, IREntity lat) {
+        for (var value : values)
+            if (value == ori) value = lat;
+    }
+
+    @Override
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
     }
 }

@@ -1,6 +1,7 @@
 package IR.inst;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import IR.IRBasicBlock;
 import IR.IRVisitor;
@@ -29,6 +30,28 @@ public class IRGetElementPtrInst extends IRInst {
         for (var idx : list) 
             res += ", " + idx.type + " " + idx;
         return res;
+    }
+
+    @Override
+    public LinkedList<IREntity> getUse() {
+        return new LinkedList<>() {
+            {
+                add(ptr);
+                for (var idx : list)
+                    add(idx);
+            }
+        };
+    }
+    @Override
+    public IRVar getDef() {
+        return dest;
+    }
+    @Override
+    public void renameUse(IREntity ori, IREntity lat) {
+        if (ptr == ori) ptr = lat;
+        for (int i = 0; i < list.size(); i++)
+          if (list.get(i) == ori)
+            list.set(i, lat);
     }
 
     @Override 

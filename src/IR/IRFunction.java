@@ -11,7 +11,7 @@ public class IRFunction {
     public String name;
     public IRType returnType;
     public IRVar returnAddr;
-    public IRBasicBlock returnBlock;
+    public IRBasicBlock entryBlock, returnBlock;
 
     public ArrayList<IRVar> params = new ArrayList<IRVar>();
     public LinkedList<IRBasicBlock> blocks = new LinkedList<IRBasicBlock>();
@@ -23,7 +23,7 @@ public class IRFunction {
     }
 
     public void finish() {
-        IRBasicBlock entryBlock = blocks.getFirst();
+        entryBlock = blocks.getFirst();
         for (IRAllocaInst inst : allocaInsts)
             entryBlock.insts.addFirst(inst);
         blocks.add(returnBlock);

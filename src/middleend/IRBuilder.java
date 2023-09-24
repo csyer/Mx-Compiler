@@ -138,14 +138,18 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
         node.defs.forEach(unit -> unit.accept(this));
     }
 
+    int param_idx = -1;
     @Override
     public void visit(ParameterNode node) {
+        if (currentClass != null) 
+            param_idx = 0;
         node.list.forEach(unit -> {
             unit.accept(this);
             IRVar input = new IRLocalVar(toIRType(unit.type), "");
             currentFunc.params.add(input);
-            currentBlock.addInst(new IRStoreInst(currentBlock, input, currentScope.IRVars.get(unit.varName)));
+            currentBlock.addInst(new IRStoreInst(currentBlock, input, currentScope.IRVars.get(unit.varName), param_idx++));
         });
+        param_idx = -1;
     }
 
     @Override
@@ -153,12 +157,13 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
         IRBasicBlock.cnt = 0;
 
         IRType returnType = toIRType(node.returnType);
-        String funcName = currentClass != null ? currentClass.natureName() + "." + node.funcName : node.funcName;
+        String funcName = currentClass != null ? currentClass.getName() + "." + node.funcName : node.funcName;
         currentFunc = new IRFunction(returnType, funcName);
         root.funcDefs.add(currentFunc);
     
         currentScope = new Scope(currentScope);
         currentScope.returnType = node.returnType;
+        
         currentBlock = new IRBasicBlock(currentFunc, "entry");
         currentFunc.blocks.add(currentBlock);
         if (currentClass != null) {
@@ -413,14 +418,16 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
         currentFunc.blocks.add(loopBlock);
 
         IRVar arrayIdx = new IRLocalVar(type, ".arrayidx");
+        IRVar iVal2 = new IRLocalVar(irIntType, "");
+        currentBlock.addInst(new IRLoadInst(currentBlock, iVal2, iPtr));
         IRGetElementPtrInst gep = new IRGetElementPtrInst(currentBlock, arrayIdx, ptr);
-        gep.addIdx(iVal);
+        gep.addIdx(iVal2);
         currentBlock.addInst(gep);
         if (type.type instanceof IRPtrType) {
             if (((IRPtrType) type.type).type instanceof IRClassType) {
                 IRClassType classType = (IRClassType) (((IRPtrType) type.type).type);
-                if (gScope.getClass(classType.natureName()).constructor != null) {
-                    IRCallInst callCons = new IRCallInst(currentBlock, null, irVoidType, classType.natureName() + "." + classType.natureName());
+                if (gScope.getClass(classType.getName()).constructor != null) {
+                    IRCallInst callCons = new IRCallInst(currentBlock, null, irVoidType, classType.getName() + "." + classType.getName());
                     callCons.addArg(arrayIdx);
                     currentBlock.addInst(callCons);
                 }
@@ -437,7 +444,9 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
         }
 
         IRVar add = new IRLocalVar(irIntType, "");
-        currentBlock.addInst(new IRCalcInst(currentBlock, "add", add, iVal, irIntConst1));
+        IRVar iVal3 = new IRLocalVar(irIntType, "");
+        currentBlock.addInst(new IRLoadInst(currentBlock, iVal3, iPtr));
+        currentBlock.addInst(new IRCalcInst(currentBlock, "add", add, iVal3, irIntConst1));
         currentBlock.addInst(new IRStoreInst(currentBlock, add, iPtr));
 
         currentBlock.terminal = new IRJumpInst(currentBlock, condBlock);

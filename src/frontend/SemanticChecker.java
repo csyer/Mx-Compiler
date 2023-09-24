@@ -162,10 +162,9 @@ public class SemanticChecker implements ASTVisitor, BuiltinElements {
 
     @Override
     public void visit(ForStmtNode node) {
+        currentScope = new Scope(currentScope);
         if (node.initial != null) {
-            currentScope = new Scope(currentScope);
             node.initial.accept(this);
-            currentScope = currentScope.parentScope;
         }
 
         node.condition.accept(this);
@@ -182,6 +181,8 @@ public class SemanticChecker implements ASTVisitor, BuiltinElements {
         currentScope = new Scope(currentScope);
         currentScope.inLoop = node;
         node.statement.accept(this);
+        currentScope = currentScope.parentScope;
+        
         currentScope = currentScope.parentScope;
     }
 
