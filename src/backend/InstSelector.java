@@ -82,12 +82,8 @@ public class InstSelector implements IRVisitor, BuiltinElements {
         }
         currentFunc.paramSize = Math.max(argNum - 8, 0) * 4;
 
-        for (int i = 0; i < node.params.size(); i++) {
-            if (i < 8) 
-                node.params.get(i).asmReg = BaseReg.regMap.get("a" + String.valueOf(i));
-            else 
-                node.params.get(i).asmReg = new MemReg(4, i);
-        }
+        for (int i = 0; i < node.params.size() && i < 8; i++)
+            node.params.get(i).asmReg = new MemReg(node.params.get(i).type.size);
 
         for (int i = 0; i < node.blocks.size(); i++) {
             currentBlock = blockMap.get(node.blocks.get(i).name);
@@ -101,6 +97,9 @@ public class InstSelector implements IRVisitor, BuiltinElements {
 
         ASMBasicBlock entryBlock = currentFunc.blocks.get(0),
                       returnBlock = currentFunc.blocks.get(currentFunc.blocks.size() - 1);
+        for (int i = 0; i < node.params.size() && i < 8; ++i)
+            entryBlock.insts.addFirst(new ASMMvInst(node.params.get(i).asmReg, BaseReg.regMap.get("a" + i)));
+
         entryBlock.insts.addFirst(new ASMCalcImmInst("addi", BaseReg.regMap.get("sp"), BaseReg.regMap.get("sp"), new Imm(-currentFunc.stackSize)));
         returnBlock.addInst(new ASMCalcImmInst("addi", BaseReg.regMap.get("sp"), BaseReg.regMap.get("sp"), new Imm(currentFunc.stackSize)));
         returnBlock.addInst(new ASMRetInst());
@@ -215,8 +214,8 @@ public class InstSelector implements IRVisitor, BuiltinElements {
         currentBlock.addInst(new ASMMvInst(getReg(node.dest), tmp));
         for (int i = 0; i < node.values.size(); ++i) {
             IREntity val = node.values.get(i);
-            if (val instanceof IRConst constVal)
-                blockMap.get(node.labels.get(i)).phiInsts.add(new ASMLiInst(tmp, new ImmReg(constVal)));
+            if (val instanceof IRConst && !(val instanceof IRStringConst))
+                blockMap.get(node.labels.get(i)).phiInsts.add(new ASMLiInst(tmp, new ImmReg((IRConst) val)));
             else
                 blockMap.get(node.labels.get(i)).phiInsts.add(new ASMMvInst(tmp, getReg(node.values.get(i))));
         }
