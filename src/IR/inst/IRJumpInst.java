@@ -16,6 +16,11 @@ public class IRJumpInst extends IRTerminalInst {
     }
 
     @Override
+    public void replace(IRBasicBlock ori, IRBasicBlock lat) {
+        if (to == ori) to = lat;
+    }
+
+    @Override
     public String toString() {
         return "br label %" + to.name;
     }

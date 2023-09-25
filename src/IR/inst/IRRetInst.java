@@ -16,6 +16,9 @@ public class IRRetInst extends IRTerminalInst {
     }
 
     @Override
+    public void replace(IRBasicBlock ori, IRBasicBlock lat) {}
+
+    @Override
     public String toString() {
         return "ret " + value.type + " " + value;
     }

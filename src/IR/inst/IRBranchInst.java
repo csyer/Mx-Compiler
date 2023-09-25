@@ -19,6 +19,12 @@ public class IRBranchInst extends IRTerminalInst {
     }
 
     @Override
+    public void replace(IRBasicBlock ori, IRBasicBlock lat) {
+        if (iftrue == ori) iftrue = lat;
+        if (iffalse == ori) iffalse = lat;
+    }
+
+    @Override
     public String toString() {
         return "br " + cond.type + " " + cond + ", label %" + iftrue.name + ", label %" + iffalse.name;
     }

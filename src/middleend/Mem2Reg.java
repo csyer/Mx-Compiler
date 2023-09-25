@@ -37,6 +37,7 @@ public class Mem2Reg {
             addPhiInst(alloca);
         updateMap.clear();
         renameVar(func.entryBlock);
+        new MergeBlock(prog).work();
         simplifyPhi(func.entryBlock);
     }
 

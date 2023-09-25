@@ -248,6 +248,7 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
     public void visit(IfStmtNode node) {
         node.condition.accept(this);
         IREntity cond = loadVal(node.condition);
+
         IRBasicBlock lastBlock = currentBlock;
         IRBasicBlock endBlock = new IRBasicBlock(currentFunc, "if.end");
         endBlock.terminal = currentBlock.terminal;
@@ -611,9 +612,15 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
                     call.addArg(loadVal(node.rhs));
                     currentBlock.addInst(call);
                 } else {
-                    node.value = new IRLocalVar(irIntType, "add");
-                    IRCalcInst calc = new IRCalcInst(currentBlock, "add", (IRVar) node.value, loadVal(node.lhs), loadVal(node.rhs));
-                    currentBlock.addInst(calc);
+                    IREntity lv = loadVal(node.lhs),
+                             rv = loadVal(node.rhs);
+                    if ((lv instanceof IRIntConst li) && (rv instanceof IRIntConst ri)) {
+                        node.value = new IRIntConst(li.value + ri.value);
+                    } else {
+                        node.value = new IRLocalVar(irIntType, "add");
+                        IRCalcInst calc = new IRCalcInst(currentBlock, "add", (IRVar) node.value, lv, rv);
+                        currentBlock.addInst(calc);
+                    }
                 }
                 break;
             }
@@ -635,10 +642,19 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
                     call.addArg(loadVal(node.rhs));
                     currentBlock.addInst(call);
                 } else {
-                    op = "s" + op;
-                    node.value = new IRLocalVar(irBoolType, op);
-                    IRIcmpInst calc = new IRIcmpInst(currentBlock, op, (IRVar) node.value, loadVal(node.lhs), loadVal(node.rhs));
-                    currentBlock.addInst(calc);
+                    IREntity lv = loadVal(node.lhs),
+                             rv = loadVal(node.rhs);
+                    if ((lv instanceof IRIntConst li) && (rv instanceof IRIntConst ri)) {
+                        if (op.equals("lt")) node.value = new IRBoolConst(li.value < ri.value);
+                        if (op.equals("gt")) node.value = new IRBoolConst(li.value > ri.value);
+                        if (op.equals("le")) node.value = new IRBoolConst(li.value <= ri.value);
+                        if (op.equals("ge")) node.value = new IRBoolConst(li.value <= ri.value);
+                    } else {
+                        op = "s" + op;
+                        node.value = new IRLocalVar(irBoolType, op);
+                        IRIcmpInst calc = new IRIcmpInst(currentBlock, op, (IRVar) node.value, lv, rv);
+                        currentBlock.addInst(calc);
+                    }
                 }
                 break;
             }
@@ -649,9 +665,19 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
                 node.rhs.accept(this);
                 if (node.op.equals("==")) op = "eq";
                 else if (node.op.equals("!=")) op = "ne";
-                node.value = new IRLocalVar(irBoolType, op);
-                IRIcmpInst calc = new IRIcmpInst(currentBlock, op, (IRVar) node.value, loadVal(node.lhs), loadVal(node.rhs));
-                currentBlock.addInst(calc);
+                IREntity lv = loadVal(node.lhs),
+                         rv = loadVal(node.rhs);
+                if ((lv instanceof IRIntConst li) && (rv instanceof IRIntConst ri)) {
+                    if (op.equals("eq")) node.value = new IRBoolConst(li.value == ri.value);
+                    if (op.equals("ne")) node.value = new IRBoolConst(li.value != ri.value);
+                } else if ((lv instanceof IRBoolConst li) && (rv instanceof IRBoolConst ri)) {
+                    if (op.equals("eq")) node.value = new IRBoolConst(li.value == ri.value);
+                    if (op.equals("ne")) node.value = new IRBoolConst(li.value != ri.value);
+                } else {
+                    node.value = new IRLocalVar(irBoolType, op);
+                    IRIcmpInst calc = new IRIcmpInst(currentBlock, op, (IRVar) node.value, lv, rv);
+                    currentBlock.addInst(calc);
+                }
                 break;
             }
 
@@ -660,6 +686,19 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
                 node.lhs.accept(this);
                 if (node.op.equals("&&")) op = "and";
                 else op = "or";
+                IREntity lv = loadVal(node.lhs);
+                if (lv instanceof IRBoolConst lb) {
+                    if (op.equals("and") && !lb.value) node.value = new IRBoolConst(false);
+                    else if (op.equals("or") && lb.value) node.value = new IRBoolConst(true);
+                    else {
+                        node.rhs.accept(this);
+                        IREntity rv = loadVal(node.rhs);
+                        if (rv instanceof IRBoolConst rb)
+                            node.value = new IRBoolConst(lb.value);
+                        else currentBlock.addInst(new IRStoreInst(currentBlock, rv, node.ptr));
+                    }
+                    break;
+                }
                 node.ptr = new IRLocalVar(new IRPtrType(irBoolType), op);
                 currentBlock.addInst(new IRAllocaInst(currentBlock, node.ptr, irBoolType));
                 IRBasicBlock rhsBlock = new IRBasicBlock(currentFunc, "land.rhs");
@@ -667,11 +706,10 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
                 IRBasicBlock falseBlock = new IRBasicBlock(currentFunc, "land.false");
                 IRBasicBlock endBlock = new IRBasicBlock(currentFunc, "land.end");
                 endBlock.terminal = currentBlock.terminal;
-                if (op.equals("and")) {
-                    currentBlock.terminal = new IRBranchInst(currentBlock, loadVal(node.lhs), rhsBlock, falseBlock);
-                } else {
-                    currentBlock.terminal = new IRBranchInst(currentBlock, loadVal(node.lhs), trueBlock, rhsBlock);
-                }
+                if (op.equals("and"))
+                    currentBlock.terminal = new IRBranchInst(currentBlock, lv, rhsBlock, falseBlock);
+                else
+                    currentBlock.terminal = new IRBranchInst(currentBlock, lv, trueBlock, rhsBlock);
                 currentBlock.isFinished = true;
 
                 currentBlock = rhsBlock;
@@ -710,9 +748,23 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
                 else if (node.op.equals("&")) op = "and";
                 else if (node.op.equals("|")) op = "or";
                 else if (node.op.equals("^")) op = "xor";
-                node.value = new IRLocalVar(irIntType, op);
-                IRCalcInst calc = new IRCalcInst(currentBlock, op, (IRVar) node.value, loadVal(node.lhs), loadVal(node.rhs));
-                currentBlock.addInst(calc);
+                IREntity lv = loadVal(node.lhs),
+                         rv = loadVal(node.rhs);
+                if ((lv instanceof IRIntConst li) && (rv instanceof IRIntConst ri)) {
+                    if (op.equals("sub")) node.value = new IRIntConst(li.value - ri.value);
+                    if (op.equals("mul")) node.value = new IRIntConst(li.value * ri.value);
+                    if (op.equals("sdiv")) node.value = new IRIntConst(li.value / ri.value);
+                    if (op.equals("srem")) node.value = new IRIntConst(li.value % ri.value);
+                    if (op.equals("shl")) node.value = new IRIntConst(li.value << ri.value);
+                    if (op.equals("ashr")) node.value = new IRIntConst(li.value >> ri.value);
+                    if (op.equals("and")) node.value = new IRIntConst(li.value & ri.value);
+                    if (op.equals("or")) node.value = new IRIntConst(li.value | ri.value);
+                    if (op.equals("xor")) node.value = new IRIntConst(li.value ^ ri.value);
+                } else {
+                    node.value = new IRLocalVar(irIntType, op);
+                    IRCalcInst calc = new IRCalcInst(currentBlock, op, (IRVar) node.value, lv, rv);
+                    currentBlock.addInst(calc);
+                }
                 break;
             }
         }
