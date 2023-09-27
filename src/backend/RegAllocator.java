@@ -21,10 +21,9 @@ public class RegAllocator {
     }
 
     void reallocateSrc(BaseReg reg, Reg src) {
-        if (src instanceof ImmReg) {
-            workList.add(new ASMLiInst(reg, (ImmReg) src));
-        } else if (src instanceof MemReg) {
-            MemReg srcReg = (MemReg) src;
+        if (src instanceof ImmReg imm) {
+            workList.add(new ASMLiInst(reg, imm));
+        } else if (src instanceof MemReg srcReg) {
             int offset, id = srcReg.id;
             if (id != -1)
                 offset = memBegin + id * 4;

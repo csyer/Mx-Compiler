@@ -24,12 +24,12 @@ public class Mem2Reg {
 
     public void work() {
         new DomTreeBuilder(prog).work();
-        prog.funcDefs.forEach(func -> build(func));
+        prog.funcDefs.forEach(func -> solve(func));
     }
 
     IRFunction curFunc = null;
 
-    void build(IRFunction func) {
+    void solve(IRFunction func) {
         curFunc = func;
         collectUses();
         collectAllocas();
@@ -37,7 +37,6 @@ public class Mem2Reg {
             addPhiInst(alloca);
         updateMap.clear();
         renameVar(func.entryBlock);
-        new MergeBlock(prog).work();
         simplifyPhi(func.entryBlock);
     }
 

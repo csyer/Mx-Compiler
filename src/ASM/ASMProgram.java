@@ -17,11 +17,11 @@ public class ASMProgram {
         if (gVars.size() > 0)
             res += "\n    .section data\n";
         for (var gVar : gVars)
-            res += gVar;
+            res += gVar.declare();
         if (gStrings.size() > 0)
             res += "\n    .section rodata\n";
         for (var gStr : gStrings)
-            res += gStr;
+            res += gStr.declare();
         return res;
     }
 }

@@ -182,7 +182,7 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
         IRBasicBlock returnBlock = new IRBasicBlock(currentFunc, "return");
         currentBlock.terminal = new IRJumpInst(currentBlock, returnBlock);
         if (node.returnType.equals(voidType)) {
-            returnBlock.terminal = new IRRetInst(returnBlock, new IRVoidConst());
+            returnBlock.terminal = new IRRetInst(returnBlock, irVoidConst);
         } else {
             IRVar retAddr = new IRLocalVar(new IRPtrType(returnType), "retval");
             returnBlock.addInst(new IRAllocaInst(currentBlock, retAddr, returnType));
@@ -411,7 +411,11 @@ public class IRBuilder implements ASTVisitor, BuiltinElements {
         IRVar cmp = new IRLocalVar(irBoolType, "");
         IRVar iVal = new IRLocalVar(irIntType, "");
         currentBlock.addInst(new IRLoadInst(currentBlock, iVal, iPtr));
-        currentBlock.addInst(new IRIcmpInst(currentBlock, "slt", cmp, iVal, size));
+        if (size instanceof IRIntConst c) {
+            IRIntConst size2 = new IRIntConst(c.value);
+            currentBlock.addInst(new IRIcmpInst(currentBlock, "slt", cmp, iVal, size2));
+        }
+        else currentBlock.addInst(new IRIcmpInst(currentBlock, "slt", cmp, iVal, size));
         currentBlock.terminal = new IRBranchInst(currentBlock, cmp, loopBlock, endBlock);
         currentBlock.isFinished = true;
 

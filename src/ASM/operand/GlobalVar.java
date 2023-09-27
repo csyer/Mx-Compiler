@@ -17,8 +17,7 @@ public class GlobalVar extends Global {
         }
     }
 
-    @Override
-    public String toString() {
+    public String declare() {
         return "    .globl " + name + "\n" + name + ":\n" + "    .word " + word + "\n";
     }
 }

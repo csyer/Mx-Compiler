@@ -28,13 +28,25 @@ public class InstSelector implements IRVisitor, BuiltinElements {
 
     Reg getReg(IREntity entity) {
         if (entity.asmReg == null) {
-            if (entity instanceof IRConst) 
-                entity.asmReg = new ImmReg((IRConst) entity);
-            else {
-                if (entity.type instanceof IRClassType)
-                    entity.asmReg = new MemReg(entity.type.size);
-                else entity.asmReg = new MemReg(4);
+            if (entity instanceof IRConst c) {
+                if (c instanceof IRIntConst && ((IRIntConst) c).value == 0)
+                    entity.asmReg = BaseReg.regMap.get("zero");
+                else if (c instanceof IRBoolConst && !((IRBoolConst) c).value)
+                    entity.asmReg = BaseReg.regMap.get("zero");
+                else {
+                    Reg reg = new MemReg(4);
+                    currentBlock.addInst(new ASMLiInst(reg, new ImmReg(c)));
+                    return reg;
+                }
             }
+            else if (entity instanceof IRVar)
+                entity.asmReg = new MemReg(4);
+        } else if (entity.asmReg instanceof Global) {
+            MemReg reg = new MemReg(4);
+            String name = ((Global) entity.asmReg).name;
+            currentBlock.addInst(new ASMLuiInst(reg, new RelocationFunc("hi", name)));
+            currentBlock.addInst(new ASMCalcImmInst("addi", reg, reg, new RelocationFunc("lo", name)));
+            return reg;
         }
         return entity.asmReg;
     }
@@ -76,8 +88,8 @@ public class InstSelector implements IRVisitor, BuiltinElements {
         for (var block : node.blocks) {
             blockMap.put(block.name, new ASMBasicBlock(".LBB" + String.valueOf(funcCnt) + "_" + String.valueOf(blockCnt++)));
             for (var inst : block.insts) {
-                if (inst instanceof IRCallInst)
-                    argNum = Math.max(argNum, ((IRCallInst) inst).args.size());
+                if (inst instanceof IRCallInst call)
+                    argNum = Math.max(argNum, call.args.size());
             };
         }
         currentFunc.paramSize = Math.max(argNum - 8, 0) * 4;
@@ -92,17 +104,27 @@ public class InstSelector implements IRVisitor, BuiltinElements {
             node.blocks.get(i).accept(this);
             currentFunc.blocks.add(currentBlock);
         }
-        currentFunc.stackSize = currentFunc.paramSize + currentFunc.allocaSize + MemReg.cnt * 4;
-        currentFunc.stackSize = (currentFunc.stackSize / 16 + 1) * 16;
-
         ASMBasicBlock entryBlock = currentFunc.blocks.get(0),
                       returnBlock = currentFunc.blocks.get(currentFunc.blocks.size() - 1);
-        for (int i = 0; i < node.params.size() && i < 8; ++i)
+        for (int i = 0; i < node.params.size() && i < 8; i++)
             entryBlock.insts.addFirst(new ASMMvInst(node.params.get(i).asmReg, BaseReg.regMap.get("a" + i)));
+
+        if (!node.name.equals("main"))
+            for (var reg : BaseReg.calleeSave) {
+                MemReg storeReg = new MemReg(4);
+                entryBlock.insts.addFirst(new ASMMvInst(storeReg, reg));
+                returnBlock.insts.addLast(new ASMMvInst(reg, storeReg));
+            }
+
+        currentFunc.stackSize = currentFunc.spillSize + currentFunc.paramSize + currentFunc.allocaSize + MemReg.cnt * 4;
+        currentFunc.stackSize = (currentFunc.stackSize / 16 + 1) * 16;
 
         entryBlock.insts.addFirst(new ASMCalcImmInst("addi", BaseReg.regMap.get("sp"), BaseReg.regMap.get("sp"), new Imm(-currentFunc.stackSize)));
         returnBlock.addInst(new ASMCalcImmInst("addi", BaseReg.regMap.get("sp"), BaseReg.regMap.get("sp"), new Imm(currentFunc.stackSize)));
         returnBlock.addInst(new ASMRetInst());
+
+        currentFunc.entryBlock = entryBlock;
+        currentFunc.returnBlock = returnBlock;
 
         for (var block : currentFunc.blocks) {
             block.insts.addAll(block.phiInsts);
@@ -120,6 +142,11 @@ public class InstSelector implements IRVisitor, BuiltinElements {
     public void visit(IRBranchInst node) {
         currentBlock.addInst(new ASMBranchInst("beq", getReg(node.cond), BaseReg.regMap.get("zero"), blockMap.get(node.iffalse.name)));
         currentBlock.addInst(new ASMJumpInst(blockMap.get(node.iftrue.name)));
+
+        currentBlock.succs.add(blockMap.get(node.iftrue.name));
+        blockMap.get(node.iftrue.name).preds.add(currentBlock);
+        currentBlock.succs.add(blockMap.get(node.iffalse.name));
+        blockMap.get(node.iffalse.name).preds.add(currentBlock);
     }
 
     public void visit(IRCalcInst node) {
@@ -140,14 +167,15 @@ public class InstSelector implements IRVisitor, BuiltinElements {
     }
 
     public void visit(IRCallInst node) {
+        ASMCallInst call = new ASMCallInst(node.funcName);
         for (int i = 0; i < node.args.size(); i++) {
             IREntity arg = node.args.get(i);
-            if (i < 8)
-                currentBlock.addInst(new ASMMvInst(BaseReg.regMap.get("a" + String.valueOf(i)), getReg(arg)));
-            else
-                storeMem(getReg(arg), BaseReg.regMap.get("sp"), (i - 8) * 4);
+            if (i < 8) {
+                currentBlock.addInst(new ASMMvInst(BaseReg.regMap.get("a" + i), getReg(arg)));
+                call.add(BaseReg.regMap.get("a" + i));
+            } else storeMem(getReg(arg), BaseReg.regMap.get("sp"), (i - 8) * 4);
         }
-        currentBlock.addInst(new ASMCallInst(node.funcName));
+        currentBlock.addInst(call);
         if (node.dest != null)
             currentBlock.addInst(new ASMMvInst(getReg(node.dest), BaseReg.regMap.get("a0")));
     }
@@ -192,6 +220,8 @@ public class InstSelector implements IRVisitor, BuiltinElements {
 
     public void visit(IRJumpInst node) {
         currentBlock.addInst(new ASMJumpInst(blockMap.get(node.to.name)));
+        currentBlock.succs.add(blockMap.get(node.to.name));
+        blockMap.get(node.to.name).preds.add(currentBlock);
     }
 
     public void visit(IRLoadInst node) {
@@ -205,20 +235,21 @@ public class InstSelector implements IRVisitor, BuiltinElements {
     }
 
     public void visit(IRStoreInst node) {
-        if (node.param_idx < 8) 
-            storeMem(getReg(node.value), getReg(node.ptr), 0);
+        storeMem(getReg(node.value), getReg(node.ptr), 0);
     }
 
     public void visit(IRPhiInst node) {
         MemReg tmp = new MemReg(node.dest.type.size);
+        ASMBasicBlock block = currentBlock;
         currentBlock.addInst(new ASMMvInst(getReg(node.dest), tmp));
         for (int i = 0; i < node.values.size(); ++i) {
             IREntity val = node.values.get(i);
+            currentBlock = blockMap.get(node.labels.get(i));
             if (val instanceof IRConst && !(val instanceof IRStringConst))
                 blockMap.get(node.labels.get(i)).phiInsts.add(new ASMLiInst(tmp, new ImmReg((IRConst) val)));
-            else
-                blockMap.get(node.labels.get(i)).phiInsts.add(new ASMMvInst(tmp, getReg(node.values.get(i))));
+            else blockMap.get(node.labels.get(i)).phiInsts.add(new ASMMvInst(tmp, getReg(val)));
         }
+        currentBlock = block;
     }
 
 }

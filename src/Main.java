@@ -7,7 +7,7 @@ import ASM.ASMProgram;
 import IR.IRProgram;
 import ast.*;
 import backend.InstSelector;
-import backend.RegAllocator;
+import backend.GraphColoring;
 import frontend.*;
 import middleend.*;
 import parser.*;
@@ -67,7 +67,8 @@ public class Main {
 
                         ASMProgram asmProgram = new ASMProgram();
                         new InstSelector(asmProgram).visit(irProgram);
-                        new RegAllocator(asmProgram).work();
+                        // new RegAllocator(asmProgram).work();
+                        new GraphColoring(asmProgram).work();
                         // FileOutputStream asmOut = new FileOutputStream("test.s");
                         // asmOut.write(asmProgram.toString().getBytes());
                         // asmOut.close();

@@ -16,6 +16,6 @@ public class MemReg extends Reg {
 
     @Override
     public String toString() {
-        return "";
+        return "REG " + id;
     }
 }

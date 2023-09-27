@@ -5,4 +5,9 @@ public abstract class Global extends Reg {
     public Global(String name) {
         this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

@@ -8,7 +8,7 @@ public class GlobalString extends Global {
         this.str = str;
     }
   
-    public String toString() {
+    public String declare() {
         return name + ":\n    .asciz \"" + str.replace("\\", "\\\\").replace("\n", "\\n").replace("\0", "").replace("\t", "\\t").replace("\"", "\\\"") + "\"\n";
     }   
 }

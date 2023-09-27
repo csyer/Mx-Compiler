@@ -17,7 +17,8 @@ public class MergeBlock {
         prog.funcDefs.forEach(func -> {
             solve(func.entryBlock);
             LinkedList<IRBasicBlock> blockList = new LinkedList<>();
-            for (var block : func.blocks) {
+            for (int i = 0; i < func.blocks.size(); i++) {
+                IRBasicBlock block = func.blocks.get(i);
                 if (!block.preds.isEmpty() || block == func.entryBlock)
                     blockList.add(block);
                 else {
@@ -35,7 +36,7 @@ public class MergeBlock {
         if (node.preds.size() == 1) {
             IRBasicBlock pre = node.preds.get(0);
             if (pre.succs.size() == 1) {
-                System.err.println(node.name);
+                // System.err.println(node.name);
                 for (var inst : node.insts) 
                     pre.insts.add(inst);
                 pre.succs = node.succs;

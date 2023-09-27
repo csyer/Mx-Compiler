@@ -5,10 +5,12 @@ import java.util.ArrayList;
 public class ASMFunction {
     public String name;
     public ArrayList<ASMBasicBlock> blocks = new ArrayList<ASMBasicBlock>();
-
+    public ASMBasicBlock entryBlock, returnBlock;
+    
     public int stackSize = 0, 
                paramSize = 0, 
-               allocaSize = 4;
+               allocaSize = 4,
+               spillSize = 0;
 
     public ASMFunction(String name) {
         this.name = name;
