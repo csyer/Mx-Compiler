@@ -15,6 +15,11 @@ public class IRNullConst extends IRConst {
     }
     
     @Override
+    public boolean equals(Object obj) {
+        return obj instanceof IRNullConst;
+    }
+
+    @Override
     public String toString() {
         return "null";
     }

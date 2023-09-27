@@ -138,20 +138,31 @@ public class Mem2Reg {
     }
 
     void simplifyPhi(IRBasicBlock block) {
+        // System.err.println("Simplify " + curFunc.name + " " + block.name);
         boolean[] isDeleted = new boolean[block.phiInsts.size()];
         for (int i = 0; i < block.phiInsts.size(); i++) {
             isDeleted[i] = false;
             IRPhiInst phi = block.phiInsts.get(i);
             IREntity val = phi.values.get(0);
             boolean flag = true;
-            for (int j = 1; j < phi.values.size(); ++j)
-                if (phi.values.get(j) != val) {
+            // System.err.print("  Simplify " + phi.dest + " " + val + " ");
+            // for (int j = 1; j < phi.values.size(); j++)
+            //     System.err.print(phi.values.get(j) + " ");
+            // System.err.println("");
+            for (int j = 1; j < phi.values.size(); j++)
+                if (!phi.values.get(j).equals(val)) {
+                    // System.err.println("    " + j + " : " + phi.values.get(j).equals(val));
                     flag = false;
                     break;
                 }
             if (flag) {
+                // System.err.println("  Removed");
                 isDeleted[i] = true;
-                block.insts.forEach(inst -> inst.renameUse(phi.dest, val));
+                curFunc.blocks.forEach(b -> {
+                    b.insts.forEach(inst -> inst.renameUse(phi.dest, val));
+                    b.phiInsts.forEach(inst -> inst.renameUse(phi.dest, val));
+                    b.terminal.renameUse(phi.dest, val);
+                });
             }
         };
         for (int i = block.phiInsts.size() - 1; i >= 0; i--)

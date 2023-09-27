@@ -8,6 +8,11 @@ public class IRVoidConst extends IRConst {
     }
   
     @Override
+    public boolean equals(Object obj) {
+        return obj instanceof IRVoidConst;
+    }
+
+    @Override
     public String toString() {
       return "";
     }

@@ -49,8 +49,9 @@ public class IRPhiInst extends IRInst {
     }
     @Override
     public void renameUse(IREntity ori, IREntity lat) {
-        for (var value : values)
-            if (value == ori) value = lat;
+        for (int i = 0; i < values.size(); i++)
+            if (values.get(i) == ori) 
+                values.set(i, lat);
     }
 
     @Override

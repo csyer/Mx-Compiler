@@ -59,6 +59,7 @@ public class Main {
                     new IRBuilder(irProgram, globalScope).visit(ast);
                     new CFGBuilder(irProgram).work();
                     new Mem2Reg(irProgram).work();
+                    new MergeBlock(irProgram).work();
                     
                     if (assembly) {
                         FileOutputStream irOut = new FileOutputStream("test.ll");

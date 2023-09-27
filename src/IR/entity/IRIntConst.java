@@ -10,6 +10,11 @@ public class IRIntConst extends IRConst {
         this.value = value;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof IRIntConst c) && c.value == value;
+    }
+
     @Override 
     public String toString() {
         return String.valueOf(value);
